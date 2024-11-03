@@ -1,0 +1,8 @@
+Graph example 1:
+  o
+ / \
+A   B
+|   /
+A  /
+| /
+o 

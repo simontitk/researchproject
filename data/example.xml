@@ -1,0 +1,7 @@
+<Procedure>
+    <Add reagent="reagent_1" vessel="reactor_1" amount="10 mL"/>
+    <Add reagent="reagent_1" vessel="reactor_1" amount="2 mL" queue="A"/>
+    <Add reagent="reagent_2" vessel="reactor_2" amount="1 mL" queue="B"/>
+    <Stir vessel="filter" time="20 mins" queue="A"/>
+    <Stir vessel="reactor_1" time="5 mins"/>
+</Procedure>
