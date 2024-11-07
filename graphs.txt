@@ -1,4 +1,9 @@
 Graph example 1:
+
+start
+  |
+  o
+  |
   o
  / \
 A   B
