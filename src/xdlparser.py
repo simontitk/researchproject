@@ -19,8 +19,6 @@ class XDLParser:
         self.graph = StartInstruction()
         self.queues: dict[str, Instruction] = {} 
 
-    def get_queue(self, e: Element):
-        return e.attrib.get("queue", None)
     
     def has_queues(self):
         return bool(self.queues.keys())
@@ -33,16 +31,18 @@ class XDLParser:
 
         for child in root:
 
-            q = self.get_queue(child)
             i = self.mapper.map(child.tag, **child.attrib)
+            q = i.queue
 
             if q is None:
                 if not self.has_queues():
                     root_head.add_child(i)
+                    i.add_dependency(root_head)
                     print(i, "goes to root q")
                 else:
                     for qn in self.queues.values():
                         qn.add_child(i)
+                        i.add_dependency(qn)
                     self.queues = {}
                     print(i, "closes queues")
                 root_head = i
@@ -51,9 +51,11 @@ class XDLParser:
                 if q not in self.queues:
                     self.queues[q] = i
                     root_head.add_child(i)
+                    i.add_dependency(root_head)
                     print(i, "starts queue")
                 else:
                     self.queues[q].add_child(i)
+                    i.add_dependency(self.queues[q])
                     self.queues[q] = i
                     print(i, "builds queue")
         return self.graph

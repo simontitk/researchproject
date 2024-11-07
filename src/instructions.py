@@ -21,6 +21,10 @@ class Instruction:
 
     def add_child(self, instruction: "Instruction") -> None:
         self.children.append(instruction)
+        
+    
+    def add_dependency(self, instruction: "Instruction") -> None:
+        self.dependencies.append(instruction)
 
     
     def __repr__(self) -> str:
