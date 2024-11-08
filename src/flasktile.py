@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify
-from tile import Tile
 from threading import Thread
+
+from flask import Flask, jsonify, request
 from requests import post
+
+from tile import Tile
 
 
 class TileServer:
@@ -12,7 +14,7 @@ class TileServer:
         self._add_routes()
     
 
-    def _add_routes(self):
+    def _add_routes(self) -> None:
 
         @self.server.route("/")
         def index():
@@ -25,9 +27,7 @@ class TileServer:
         @self.server.route("/execute", methods=["POST"])
         def execute():
             data = request.json
-            callback_url = data["callback_url"]
-            task = data["task"]
-            thread = Thread(target=self.execute, args=(callback_url, task))
+            thread = Thread(target=self.execute, args=(data,))
             thread.start()
 
             return jsonify({
@@ -36,17 +36,20 @@ class TileServer:
             })
     
 
-    def execute(self, callback_url: str, task):
-        self.tile.execute(task)
-        post(url=callback_url, json={"status": self.tile.status})
+    def execute(self, data: dict) -> None:
+        self.tile.execute(data["task"])
+        post(url=data["callback_url"], json={
+            "status": self.tile.status,
+            "task_id": data["task_id"]
+        })
 
         
-    def run(self):
+    def run(self) -> None:
         self.server.run(port=self.port)
         print("running server")
     
 
-    def run_thread(self):
+    def run_thread(self) -> None:
         thread = Thread(target=self.run)
         thread.start()
         return thread
