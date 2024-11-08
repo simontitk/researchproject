@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element
-from instructions import InstructionMapper, Instruction, StartInstruction
+
+from instructions import Instruction, InstructionMapper, StartInstruction
+
 
 class Node:
     def __init__(self, instruction: Instruction) -> None:
