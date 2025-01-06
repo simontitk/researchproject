@@ -24,12 +24,19 @@ class XDLParser:
     def has_queues(self):
         return bool(self.queues.keys())
  
-    
-    def parse(self, path: str):
-        root_head = self.graph
-        tree = ET.parse(path)
-        root = tree.getroot()
 
+    def parse_file(self, path: str):
+        root = ET.parse(path).getroot()
+        self._parse(root)
+
+
+    def parse_str(self, content: str):
+        root = ET.fromstring(content)
+        self._parse(root)
+    
+
+    def _parse(self, root: ET.Element):
+        root_head = self.graph
         for child in root:
 
             i = self.mapper.map(child.tag, **child.attrib)
