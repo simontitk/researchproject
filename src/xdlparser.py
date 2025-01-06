@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from os.path import isfile
 
 from instructions import Instruction, InstructionMapper, StartInstruction
 
@@ -20,22 +21,32 @@ class XDLParser:
         self.graph = StartInstruction()
         self.queues: dict[str, Instruction] = {} 
 
+
+    @staticmethod
+    def _get_root(xdl: str):
+        if isfile(xdl):
+            return ET.parse(xdl).getroot()
+        else:
+            return ET.fromstring(xdl)
     
+
+    def get_vessels(self, xdl: str) -> dict[str, str]:
+        vessels: dict[str, str] = {}
+        root = self._get_root(xdl)
+        for element in root.iter():
+            vessel = element.get("vessel")
+            queue = element.get("queue")
+            if vessel:
+                vessels[vessel] = queue or "root"
+        return vessels
+
+
     def has_queues(self):
         return bool(self.queues.keys())
- 
-
-    def parse_file(self, path: str):
-        root = ET.parse(path).getroot()
-        self._parse(root)
-
-
-    def parse_str(self, content: str):
-        root = ET.fromstring(content)
-        self._parse(root)
     
 
-    def _parse(self, root: ET.Element):
+    def parse(self, xdl: str):
+        root = self._get_root(xdl)
         root_head = self.graph
         for child in root:
 
@@ -66,6 +77,7 @@ class XDLParser:
                     i.add_dependency(self.queues[q])
                     self.queues[q] = i
                     print(i, "builds queue")
+        print(self.queues)
         return self.graph
 
 
