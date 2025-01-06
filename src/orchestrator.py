@@ -5,17 +5,19 @@ from threading import Thread
 import requests
 from flask import Flask, jsonify, render_template, request
 
+from flask_cors import CORS
 from instructions import Instruction, InstructionStatus
 from xdlparser import XDLParser
 
 
 class Orchestrator:
 
-    def __init__(self, port: int, tile_map: dict[str, int], reaction_xml: str) -> None:
+    def __init__(self, port: int, tile_map: dict[str, dict], reaction_xml: str) -> None:
         self.DAG = XDLParser().parse(reaction_xml)
-        self.server = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '../templates'))
+        self.server = Flask(__name__)
+        CORS(self.server)
         self.port = port
-        self.tile_map = tile_map
+        self.tile_map = {vessel["vessel"]: vessel["port"] for vessel in tile_map}
         self._add_routes()
 
 
@@ -23,13 +25,19 @@ class Orchestrator:
 
         @self.server.route("/")
         def index():
+            return jsonify({"message": f"Service is running for orchestrator at port {self.port}."})
+        
+
+        @self.server.route("/start", methods=["POST"])
+        def start(): 
             self.process_instruction(self.DAG)
-            return "started"
+            return jsonify("Execution started.")
 
 
         @self.server.route("/send")
         def send():
             self.send_instruction("http://localhost:5001/execute")
+            print("THIS ENDPOINT DID SOMETHING")
             return "", 200
         
 

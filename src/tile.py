@@ -11,13 +11,16 @@ class TileStates(StrEnum):
 class Tile:
     def __init__(self, id: str, status: TileStates = TileStates.READY) -> None:
         self.status = status
+        self.params = {}
         self.id = id
     
-    def execute(self, args):
+    def execute(self, params):
         """Method overridden in each subclass for its corresponding instructions"""
         self.status = TileStates.BUSY
-        sleep(30)
+        self.params = params
+        sleep(15)
         self.status = TileStates.READY
+        self.params = {}
         
 
 

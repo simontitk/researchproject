@@ -30,14 +30,20 @@ class XDLParser:
             return ET.fromstring(xdl)
     
 
-    def get_vessels(self, xdl: str) -> dict[str, str]:
-        vessels: dict[str, str] = {}
+    def get_vessels(self, xdl: str) -> list[dict[str, str]]:
+
+        vessels: list[dict[str, str]] = []
+        checked_vessels: set[str] = set()
         root = self._get_root(xdl)
         for element in root.iter():
             vessel = element.get("vessel")
             queue = element.get("queue")
-            if vessel:
-                vessels[vessel] = queue or "root"
+            if vessel and (vessel not in checked_vessels):
+                checked_vessels.add(vessel)
+                vessels.append({
+                    "vessel": vessel,
+                    "queue": queue or "root"
+                })
         return vessels
 
 
